@@ -1,8 +1,19 @@
 const express = require('express');
 const router = express.Router();
-const reportCardController = require('../controllers/reportCardController');
 
-router.post('/', reportCardController.createReportCard);
-router.get('/:id', reportCardController.getReportCard);
+const {
+    createReportCard,
+    getAllReportCards,
+    getReportCard
+} = require('../controllers/reportCardController');
+
+// Get all report cards
+router.get('/', getAllReportCards);
+
+// Get single report card
+router.get('/:id', getReportCard);
+
+// Create report card
+router.post('/', createReportCard);
 
 module.exports = router;

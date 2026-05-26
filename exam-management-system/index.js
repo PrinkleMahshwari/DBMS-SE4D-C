@@ -12,6 +12,8 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
+// Serve static files from the "public" folder
+app.use(express.static('public'));
 
 // ========== ROUTES ==========
 // Import routes

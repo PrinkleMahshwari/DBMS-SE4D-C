@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Basic page setup -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Examination Management System</title>
+
+    <!-- Favicon created by code -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+    <!-- Font Awesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Mobile overlay, when sidebar opens -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+        <div class="brand">
+            <div class="brand-icon">
+                <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+            <div>
+                <h2>SEMS</h2>
+                <p>Examination System</p>
+            </div>
+        </div>
+
+        <nav class="side-nav">
+            <a href="#" class="nav-link active" data-page="dashboard">
+                <i class="fa-solid fa-chart-line"></i> Dashboard
+            </a>
+            <a href="#" class="nav-link" data-page="students">
+                <i class="fa-solid fa-user-graduate"></i> Students
+            </a>
+            <a href="#" class="nav-link" data-page="teachers">
+                <i class="fa-solid fa-chalkboard-user"></i> Teachers
+            </a>
+            <a href="#" class="nav-link" data-page="classes">
+                <i class="fa-solid fa-school"></i> Classes
+            </a>
+            <a href="#" class="nav-link" data-page="subjects">
+                <i class="fa-solid fa-book-open"></i> Subjects
+            </a>
+            <a href="#" class="nav-link" data-page="exams">
+                <i class="fa-solid fa-file-pen"></i> Exams
+            </a>
+            <a href="#" class="nav-link" data-page="results">
+                <i class="fa-solid fa-square-poll-vertical"></i> Results
+            </a>
+            <a href="#" class="nav-link" data-page="reports">
+                <i class="fa-solid fa-file-lines"></i> Report Cards
+            </a>
+            <a href="#" class="nav-link" data-page="attendance">
+                <i class="fa-solid fa-clipboard-check"></i> Attendance
+            </a>
+            <a href="#" class="nav-link" data-page="marksRequests">
+                <i class="fa-solid fa-pen-to-square"></i> Marks Edit Requests
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Area -->
+    <main class="main-content">
+        <!-- Top Navbar -->
+        <header class="topbar">
+            <button class="hamburger" id="hamburgerBtn" title="Open menu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <div>
+                <h1 id="pageTitle">Dashboard</h1>
+                <p id="pageSubtitle">School Examination Management System overview</p>
+            </div>
+
+            <div class="topbar-right">
+                <span class="status-pill">
+                    <i class="fa-solid fa-circle"></i> API Connected
+                </span>
+            </div>
+        </header>
+
+        <!-- Toast Message -->
+        <div class="toast" id="toast"></div>
+
+        <!-- Dashboard Page -->
+        <section class="page active" id="dashboard">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fa-solid fa-user-graduate"></i>
+                    <div>
+                        <span id="totalStudents">0</span>
+                        <p>Total Students</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <i class="fa-solid fa-chalkboard-user"></i>
+                    <div>
+                        <span id="totalTeachers">0</span>
+                        <p>Total Teachers</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <i class="fa-solid fa-school"></i>
+                    <div>
+                        <span id="totalClasses">0</span>
+                        <p>Total Classes</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <i class="fa-solid fa-book"></i>
+                    <div>
+                        <span id="totalSubjects">0</span>
+                        <p>Total Subjects</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <i class="fa-solid fa-file-pen"></i>
+                    <div>
+                        <span id="totalExams">0</span>
+                        <p>Total Exams</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <i class="fa-solid fa-clipboard-check"></i>
+                    <div>
+                        <span id="totalAttendance">0</span>
+                        <p>Attendance Records</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <i class="fa-solid fa-file-lines"></i>
+                    <div>
+                        <span id="totalReportCards">0</span>
+                        <p>Report Cards</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="section-heading">
+                        <h2>Students Per Class</h2>
+                        <p>Class wise student count</p>
+                    </div>
+                    <div class="chart-box">
+                        <canvas id="studentsChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="section-heading">
+                        <h2>Result Summary</h2>
+                        <p>Pass and fail ratio</p>
+                    </div>
+                    <div class="chart-box">
+                        <canvas id="passFailChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="section-heading">
+                        <h2>Subject Average Marks</h2>
+                        <p>Average result percentage by subject</p>
+                    </div>
+                    <div class="chart-box">
+                        <canvas id="subjectAverageChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="section-heading">
+                        <h2>Teacher Types</h2>
+                        <p>Teacher distribution by role</p>
+                    </div>
+                    <div class="chart-box">
+                        <canvas id="teacherTypeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Students Page -->
+        <section class="page" id="students">
+            <div class="section-toolbar">
+                <div>
+                    <h2>Students</h2>
+                    <p>Person data + student specific data are handled together.</p>
+                </div>
+                <button class="btn primary" onclick="openStudentModal()">
+                    <i class="fa-solid fa-plus"></i> Add Student
+                </button>
+            </div>
+
+            <div class="filters">
+                <input type="search" id="studentSearch" placeholder="Search student by name, email, roll no..." oninput="renderStudents()">
+                <select id="studentClassFilter" onchange="renderStudents()">
+                    <option value="">All Classes</option>
+                </select>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Student</th>
+                            <th>Email</th>
+                            <th>Roll No</th>
+                            <th>Class</th>
+                            <th>Phone</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsBody">
+                        <tr><td colspan="7">Loading students...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Teachers Page -->
+        <section class="page" id="teachers">
+            <div class="section-toolbar">
+                <div>
+                    <h2>Teachers</h2>
+                    <p>Teacher data also uses person table plus teacher table.</p>
+                </div>
+                <button class="btn primary" onclick="openTeacherModal()">
+                    <i class="fa-solid fa-plus"></i> Add Teacher
+                </button>
+            </div>
+
+            <div class="filters">
+                <input type="search" id="teacherSearch" placeholder="Search teacher by name, email, type..." oninput="renderTeachers()">
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Teacher</th>
+                            <th>Email</th>
+                            <th>Qualification</th>
+                            <th>Experience</th>
+                            <th>Type</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="teachersBody">
+                        <tr><td colspan="7">Loading teachers...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Classes Page -->
+        <section class="page" id="classes">
+            <div class="section-toolbar">
+                <div>
+                    <h2>Classes</h2>
+                    <p>Manage class number, section, and academic year.</p>
+                </div>
+                <button class="btn primary" onclick="openClassModal()">
+                    <i class="fa-solid fa-plus"></i> Add Class
+                </button>
+            </div>
+
+            <div class="filters">
+                <input type="search" id="classSearch" placeholder="Search class, section, year..." oninput="renderClasses()">
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Class</th>
+                            <th>Section</th>
+                            <th>Academic Year</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="classesBody">
+                        <tr><td colspan="5">Loading classes...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Subjects Page -->
+        <section class="page" id="subjects">
+            <div class="section-toolbar">
+                <div>
+                    <h2>Subjects</h2>
+                    <p>Manage subjects and view subject result recap.</p>
+                </div>
+                <button class="btn primary" onclick="openSubjectModal()">
+                    <i class="fa-solid fa-plus"></i> Add Subject
+                </button>
+            </div>
+
+            <div class="filters">
+                <input type="search" id="subjectSearch" placeholder="Search subject or code..." oninput="renderSubjects()">
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Subject Name</th>
+                            <th>Subject Code</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="subjectsBody">
+                        <tr><td colspan="4">Loading subjects...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="section-heading mt">
+                <h2>Subject Result Recap</h2>
+                <p>Shows subject wise average from result table.</p>
+            </div>
+            <div class="recap-grid" id="subjectRecap"></div>
+        </section>
+
+        <!-- Exams Page -->
+        <section class="page" id="exams">
+            <div class="section-toolbar">
+                <div>
+                    <h2>Exams</h2>
+                    <p>Manage exam info. Schedule and components are shown below.</p>
+                </div>
+                <button class="btn primary" onclick="openExamModal()">
+                    <i class="fa-solid fa-plus"></i> Add Exam
+                </button>
+            </div>
+
+            <div class="filters">
+                <input type="search" id="examSearch" placeholder="Search exam name or type..." oninput="renderExams()">
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Exam Name</th>
+                            <th>Type</th>
+                            <th>Date</th>
+                            <th>Total Marks</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="examsBody">
+                        <tr><td colspan="6">Loading exams...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="section-heading mt">
+                <h2>Exam Schedule</h2>
+                <p>Showing schedule records from database.</p>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Schedule ID</th>
+                            <th>Exam</th>
+                            <th>Class</th>
+                            <th>Subject</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="examScheduleBody">
+                        <tr><td colspan="7">Loading schedules...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Results Page -->
+        <section class="page" id="results">
+            <div class="section-toolbar">
+                <div>
+                    <h2>Results</h2>
+                    <p>Final subject results with search and recap.</p>
+                </div>
+            </div>
+
+            <div class="filters">
+                <input type="search" id="resultSearch" placeholder="Search student, subject, grade..." oninput="renderResults()">
+                <select id="resultClassFilter" onchange="renderResults()">
+                    <option value="">All Classes</option>
+                </select>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Result ID</th>
+                            <th>Student</th>
+                            <th>Class</th>
+                            <th>Subject</th>
+                            <th>Term</th>
+                            <th>Marks</th>
+                            <th>%</th>
+                            <th>Grade</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsBody">
+                        <tr><td colspan="8">Loading results...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Report Cards Page -->
+        <section class="page" id="reports">
+            <div class="section-toolbar">
+                <div>
+                    <h2>Report Cards</h2>
+                    <p>Final report card style summary.</p>
+                </div>
+            </div>
+
+            <div class="filters">
+                <input type="search" id="reportSearch" placeholder="Search student, class, grade..." oninput="renderReportCards()">
+            </div>
+
+            <div class="report-grid" id="reportCardsBody">
+                <p>Loading report cards...</p>
+            </div>
+        </section>
+
+
+        <!-- Attendance Page -->
+        <section class="page" id="attendance">
+            <div class="section-toolbar">
+                <div>
+                    <h2>Attendance</h2>
+                    <p>View student attendance, attendance marks, and attendance graphs.</p>
+                </div>
+            </div>
+
+            <div class="stats-grid small-stats">
+                <div class="stat-card">
+                    <i class="fa-solid fa-user-check"></i>
+                    <div>
+                        <span id="presentCount">0</span>
+                        <p>Present</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <i class="fa-solid fa-user-xmark"></i>
+                    <div>
+                        <span id="absentCount">0</span>
+                        <p>Absent</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <i class="fa-solid fa-star"></i>
+                    <div>
+                        <span id="averageAttendanceMarks">0</span>
+                        <p>Avg Attendance Marks</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="section-heading">
+                        <h2>Attendance Status</h2>
+                        <p>Present / absent summary</p>
+                    </div>
+                    <div class="chart-box">
+                        <canvas id="attendanceStatusChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="section-heading">
+                        <h2>Attendance Marks</h2>
+                        <p>Average attendance marks by term</p>
+                    </div>
+                    <div class="chart-box">
+                        <canvas id="attendanceMarksChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-heading mt">
+                <h2>Student Attendance Records</h2>
+                <p>Showing all records from student_attendance table.</p>
+            </div>
+
+            <div class="table-wrapper mt">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Student</th>
+                            <th>Schedule</th>
+                            <th>Status</th>
+                            <th>Reason</th>
+                            <th>Re-Exam</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendanceBody">
+                        <tr><td colspan="6">Loading attendance...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="section-heading mt">
+                <h2>Attendance Marks</h2>
+                <p>Marks generated for attendance in report cards.</p>
+            </div>
+
+            <div class="table-wrapper mt">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Student</th>
+                            <th>Class</th>
+                            <th>Report Card</th>
+                            <th>Term</th>
+                            <th>Marks</th>
+                            <th>Leaves</th>
+                            <th>Absents</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendanceMarksBody">
+                        <tr><td colspan="8">Loading attendance marks...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <section class="page" id="marksRequests">
+            <div class="section-toolbar">
+                <div>
+                    <h2>Marks Edit Requests</h2>
+                    <p>View approved, pending, and rejected marks correction requests.</p>
+                </div>
+            </div>
+
+            <div class="stats-grid small-stats">
+                <div class="stat-card">
+                    <i class="fa-solid fa-clock"></i>
+                    <div>
+                        <span id="pendingRequests">0</span>
+                        <p>Pending</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <div>
+                        <span id="approvedRequests">0</span>
+                        <p>Approved</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                    <div>
+                        <span id="rejectedRequests">0</span>
+                        <p>Rejected</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-card mt">
+                <div class="section-heading">
+                    <h2>Marks Request Status</h2>
+                    <p>Request approval status graph.</p>
+                </div>
+                <div class="chart-box">
+                    <canvas id="marksRequestChart"></canvas>
+                </div>
+            </div>
+
+            <div class="section-heading mt">
+                <h2>All Marks Edit Requests</h2>
+                <p>Showing records from marks_edit_request table.</p>
+            </div>
+
+            <div class="table-wrapper mt">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Student</th>
+                            <th>Teacher</th>
+                            <th>Subject</th>
+                            <th>Exam</th>
+                            <th>Old</th>
+                            <th>New</th>
+                            <th>Reason</th>
+                            <th>Status</th>
+                            <th>Request Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="marksRequestsBody">
+                        <tr><td colspan="10">Loading marks edit requests...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>© 2026 School Examination Management System | DBMS Semester Project</p>
+        </footer>
+    </main>
+
+    <!-- Modal for all forms -->
+    <div class="modal" id="formModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add Record</h2>
+                <button class="icon-btn" onclick="closeModal()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Form fields are generated from JavaScript -->
+            <form id="dynamicForm" class="dynamic-form"></form>
+        </div>
+    </div>
+
+    <!-- Chart JS for dashboard graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Main JS -->
+    <script src="app.js"></script>
+</body>
+</html>
