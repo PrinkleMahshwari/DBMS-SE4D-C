@@ -26,6 +26,16 @@ const classTeacherAssignmentRoutes = require('./routes/classTeacherAssignmentRou
 const examRoutes = require('./routes/examRoutes');
 const classroomRoutes = require('./routes/classroomRoutes');
 const labRoutes = require('./routes/labRoutes');
+const examComponentRoutes = require('./routes/examComponentRoutes');
+const examScheduleRoutes = require('./routes/examScheduleRoutes');
+const seatAllocationRoutes = require('./routes/seatAllocationRoutes');
+const invigilationRoutes = require('./routes/invigilationRoutes');
+const studentAttendanceRoutes = require('./routes/studentAttendanceRoutes');
+const marksRoutes = require('./routes/marksRoutes');
+const marksEditRequestRoutes = require('./routes/marksEditRequestRoutes');
+const resultRoutes = require('./routes/resultRoutes');
+const attendanceMarksRoutes = require('./routes/attendanceMarksRoutes');
+const reportCardRoutes = require('./routes/reportCardRoutes');
 
 // Use routes
 app.use('/api/persons', personRoutes);
@@ -39,6 +49,16 @@ app.use('/api/class-teacher-assignments', classTeacherAssignmentRoutes);
 app.use('/api/exams', examRoutes);
 app.use('/api/classrooms', classroomRoutes);
 app.use('/api/labs', labRoutes);
+app.use('/api/exam-components', examComponentRoutes);
+app.use('/api/exam-schedules', examScheduleRoutes);
+app.use('/api/seat-allocations', seatAllocationRoutes);
+app.use('/api/invigilation', invigilationRoutes);
+app.use('/api/student-attendance', studentAttendanceRoutes);
+app.use('/api/marks', marksRoutes);
+app.use('/api/marks-edit-requests', marksEditRequestRoutes);
+app.use('/api/results', resultRoutes);
+app.use('/api/attendance-marks', attendanceMarksRoutes);
+app.use('/api/report-cards', reportCardRoutes);
 
 // Test Route
 app.get('/', (req, res) => {
