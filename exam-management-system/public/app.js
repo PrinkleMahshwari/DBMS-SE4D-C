@@ -1,14 +1,7 @@
-// ===============================
-// SCHOOL EXAMINATION MANAGEMENT SYSTEM
-// VANILLA JS FRONTEND
-// ===============================
+// vanilla javascript frontend
 
-// Base API URL
-// Because Express serves public folder, relative path will work.
-// Example: /api/students
 const API_BASE = "";
 
-// Global arrays where we store backend data after fetching
 let students = [];
 let teachers = [];
 let classes = [];
@@ -20,8 +13,8 @@ let schedules = [];
 let attendance = [];
 let attendanceMarks = [];
 let marksEditRequests = [];
+let seatAllocations = [];
 
-// Chart variables, so we can destroy old chart before creating new one
 let studentsChart = null;
 let passFailChart = null;
 let subjectAverageChart = null;
@@ -29,15 +22,9 @@ let teacherTypeChart = null;
 let attendanceStatusChart = null;
 let attendanceMarksChart = null;
 let marksRequestChart = null;
+let seatAllocationChart = null;
 
-// ===============================
-// HELPER FUNCTIONS
-// ===============================
-
-// This helper reads API response safely.
-// It supports both response formats:
-// 1) { success: true, data: [...] }
-// 2) direct array [...]
+// get data array from API response
 function extractData(responseJson) {
     if (Array.isArray(responseJson)) return responseJson;
     if (responseJson && Array.isArray(responseJson.data)) return responseJson.data;
@@ -45,7 +32,7 @@ function extractData(responseJson) {
     return [];
 }
 
-// Fetch data from API
+// fetch data from API
 async function apiGet(endpoint) {
     const response = await fetch(`${API_BASE}${endpoint}`);
     const json = await response.json();
@@ -57,11 +44,13 @@ async function apiGet(endpoint) {
     return extractData(json);
 }
 
-// Send POST request
+// send post request
 async function apiPost(endpoint, body) {
     const response = await fetch(`${API_BASE}${endpoint}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+            "Content-Type": "application/json"
+        },
         body: JSON.stringify(body)
     });
 
@@ -74,11 +63,13 @@ async function apiPost(endpoint, body) {
     return json;
 }
 
-// Send PUT request
+// send put request
 async function apiPut(endpoint, body) {
     const response = await fetch(`${API_BASE}${endpoint}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+            "Content-Type": "application/json"
+        },
         body: JSON.stringify(body)
     });
 
@@ -91,7 +82,7 @@ async function apiPut(endpoint, body) {
     return json;
 }
 
-// Send DELETE request
+// send delete request
 async function apiDelete(endpoint) {
     const response = await fetch(`${API_BASE}${endpoint}`, {
         method: "DELETE"
@@ -106,9 +97,12 @@ async function apiDelete(endpoint) {
     return json;
 }
 
-// Show success/error message
+// show small message
 function showToast(message, type = "success") {
     const toast = document.getElementById("toast");
+
+    if (!toast) return;
+
     toast.textContent = message;
 
     if (type === "error") {
@@ -124,77 +118,101 @@ function showToast(message, type = "success") {
     }, 2500);
 }
 
-// Format date for input or display
+// format date for table and input
 function formatDate(dateValue) {
     if (!dateValue) return "";
     return String(dateValue).split("T")[0];
 }
 
-// Get full name from joined person data
+// get full name
 function fullName(item) {
     const first = item.first_name || "";
     const last = item.last_name || "";
     return `${first} ${last}`.trim() || "N/A";
 }
 
-// Find class name by class_id
+// get class name by class id
 function getClassName(classId) {
     const cls = classes.find(c => String(c.class_id) === String(classId));
+
     if (!cls) return classId || "N/A";
+
     return `${cls.class_number}-${cls.section}`;
 }
 
-// Find subject name by subject_id
+// get subject name by subject id
 function getSubjectName(subjectId) {
     const subject = subjects.find(s => String(s.subject_id) === String(subjectId));
+
     return subject ? subject.subject_name : subjectId || "N/A";
 }
 
-// Find exam name by exam_id
+// get exam name by exam id
 function getExamName(examId) {
     const exam = exams.find(e => String(e.exam_id) === String(examId));
+
     return exam ? exam.exam_name : examId || "N/A";
 }
 
-// Find student name by student_id
+// get student name by student id
 function getStudentName(studentId) {
     const student = students.find(s => String(s.student_id) === String(studentId));
+
     return student ? fullName(student) : studentId || "N/A";
 }
 
-// Escape HTML to avoid layout breaking from special characters
+// make text safe before showing in html
 function safe(value) {
-    return value === null || value === undefined ? "" : String(value);
+    if (value === null || value === undefined) return "";
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
 }
 
-// ===============================
-// NAVIGATION
-// ===============================
-
+// setup sidebar navigation
 document.querySelectorAll(".nav-link").forEach(link => {
     link.addEventListener("click", event => {
         event.preventDefault();
 
         const page = link.dataset.page;
+        const pageSection = document.getElementById(page);
 
-        // Active nav link
-        document.querySelectorAll(".nav-link").forEach(nav => nav.classList.remove("active"));
+        if (!pageSection) {
+            showToast(`Page "${page}" not found`, "error");
+            return;
+        }
+
+        document.querySelectorAll(".nav-link").forEach(nav => {
+            nav.classList.remove("active");
+        });
+
         link.classList.add("active");
 
-        // Active page section
-        document.querySelectorAll(".page").forEach(section => section.classList.remove("active"));
-        document.getElementById(page).classList.add("active");
+        document.querySelectorAll(".page").forEach(section => {
+            section.classList.remove("active");
+        });
 
-        // Update title
-        const title = link.textContent.trim();
-        document.getElementById("pageTitle").textContent = title;
-        document.getElementById("pageSubtitle").textContent = getSubtitle(page);
+        pageSection.classList.add("active");
 
-        // Close menu on mobile
+        const pageTitle = document.getElementById("pageTitle");
+        const pageSubtitle = document.getElementById("pageSubtitle");
+
+        if (pageTitle) {
+            pageTitle.textContent = link.textContent.trim();
+        }
+
+        if (pageSubtitle) {
+            pageSubtitle.textContent = getSubtitle(page);
+        }
+
         closeSidebar();
     });
 });
 
+// get page subtitle
 function getSubtitle(page) {
     const subtitles = {
         dashboard: "School Examination Management System overview",
@@ -206,32 +224,52 @@ function getSubtitle(page) {
         results: "View final subject wise results",
         reports: "View final report cards",
         attendance: "View student attendance and attendance marks",
-        marksRequests: "View marks correction requests and approval status"
+        marksRequests: "View marks correction requests and approval status",
+        seatAllocation: "Allocate seats to students for scheduled exams"
     };
+
     return subtitles[page] || "";
 }
 
-// Mobile hamburger
-document.getElementById("hamburgerBtn").addEventListener("click", () => {
-    document.getElementById("sidebar").classList.add("show");
-    document.getElementById("overlay").classList.add("show");
-});
+// open sidebar on mobile
+const hamburgerBtn = document.getElementById("hamburgerBtn");
+const overlay = document.getElementById("overlay");
 
-document.getElementById("overlay").addEventListener("click", closeSidebar);
-
-function closeSidebar() {
-    document.getElementById("sidebar").classList.remove("show");
-    document.getElementById("overlay").classList.remove("show");
+if (hamburgerBtn) {
+    hamburgerBtn.addEventListener("click", () => {
+        document.getElementById("sidebar").classList.add("show");
+        document.getElementById("overlay").classList.add("show");
+    });
 }
 
-// ===============================
-// LOAD ALL DATA
-// ===============================
+if (overlay) {
+    overlay.addEventListener("click", closeSidebar);
+}
 
+// close sidebar
+function closeSidebar() {
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("overlay");
+
+    if (sidebar) {
+        sidebar.classList.remove("show");
+    }
+
+    if (overlay) {
+        overlay.classList.remove("show");
+    }
+}
+
+// close modal with escape key
+document.addEventListener("keydown", event => {
+    if (event.key === "Escape") {
+        closeModal();
+    }
+});
+
+// load all data from backend
 async function loadAllData() {
     try {
-        // Loading all important data
-        // If any route is missing, only that module can fail. Check console for details.
         const responses = await Promise.allSettled([
             apiGet("/api/students"),
             apiGet("/api/teachers"),
@@ -243,7 +281,8 @@ async function loadAllData() {
             apiGet("/api/exam-schedules"),
             apiGet("/api/student-attendance"),
             apiGet("/api/attendance-marks"),
-            apiGet("/api/marks-edit-requests")
+            apiGet("/api/marks-edit-requests"),
+            apiGet("/api/seat-allocations")
         ]);
 
         students = responses[0].status === "fulfilled" ? responses[0].value : [];
@@ -257,8 +296,10 @@ async function loadAllData() {
         attendance = responses[8].status === "fulfilled" ? responses[8].value : [];
         attendanceMarks = responses[9].status === "fulfilled" ? responses[9].value : [];
         marksEditRequests = responses[10].status === "fulfilled" ? responses[10].value : [];
+        seatAllocations = responses[11].status === "fulfilled" ? responses[11].value : [];
 
         fillClassDropdowns();
+        fillSeatScheduleDropdown();
         renderDashboard();
         renderStudents();
         renderTeachers();
@@ -270,6 +311,7 @@ async function loadAllData() {
         renderReportCards();
         renderAttendance();
         renderMarksEditRequests();
+        renderSeatAllocations();
 
     } catch (error) {
         console.error(error);
@@ -277,18 +319,15 @@ async function loadAllData() {
     }
 }
 
-// ===============================
-// DASHBOARD
-// ===============================
-
+// show dashboard data
 function renderDashboard() {
-    document.getElementById("totalStudents").textContent = students.length;
-    document.getElementById("totalTeachers").textContent = teachers.length;
-    document.getElementById("totalClasses").textContent = classes.length;
-    document.getElementById("totalSubjects").textContent = subjects.length;
-    document.getElementById("totalExams").textContent = exams.length;
-    document.getElementById("totalAttendance").textContent = attendance.length;
-    document.getElementById("totalReportCards").textContent = reportCards.length;
+    setText("totalStudents", students.length);
+    setText("totalTeachers", teachers.length);
+    setText("totalClasses", classes.length);
+    setText("totalSubjects", subjects.length);
+    setText("totalExams", exams.length);
+    setText("totalAttendance", attendance.length);
+    setText("totalReportCards", reportCards.length);
 
     renderStudentsPerClassChart();
     renderPassFailChart();
@@ -296,20 +335,34 @@ function renderDashboard() {
     renderTeacherTypeChart();
 }
 
+// set text safely
+function setText(id, value) {
+    const element = document.getElementById(id);
+
+    if (element) {
+        element.textContent = value;
+    }
+}
+
+// show students per class chart
 function renderStudentsPerClassChart() {
     const ctx = document.getElementById("studentsChart");
+
+    if (!ctx) return;
 
     const labels = classes.map(cls => `${cls.class_number}-${cls.section}`);
     const counts = classes.map(cls => {
         return students.filter(st => String(st.class_id) === String(cls.class_id)).length;
     });
 
-    if (studentsChart) studentsChart.destroy();
+    if (studentsChart) {
+        studentsChart.destroy();
+    }
 
     studentsChart = new Chart(ctx, {
         type: "bar",
         data: {
-            labels,
+            labels: labels,
             datasets: [{
                 label: "Students",
                 data: counts
@@ -319,7 +372,9 @@ function renderStudentsPerClassChart() {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { display: false }
+                legend: {
+                    display: false
+                }
             },
             scales: {
                 y: {
@@ -330,13 +385,18 @@ function renderStudentsPerClassChart() {
     });
 }
 
+// show pass fail chart
 function renderPassFailChart() {
     const ctx = document.getElementById("passFailChart");
+
+    if (!ctx) return;
 
     const pass = results.filter(r => Number(r.percentage) >= 33).length;
     const fail = results.filter(r => Number(r.percentage) < 33).length;
 
-    if (passFailChart) passFailChart.destroy();
+    if (passFailChart) {
+        passFailChart.destroy();
+    }
 
     passFailChart = new Chart(ctx, {
         type: "doughnut",
@@ -353,18 +413,21 @@ function renderPassFailChart() {
     });
 }
 
-// Subject average chart shows average percentage for each subject
+// show subject average chart
 function renderSubjectAverageChart() {
     const ctx = document.getElementById("subjectAverageChart");
+
     if (!ctx) return;
 
     const subjectGroups = {};
 
     results.forEach(result => {
         const subjectName = result.subject_name || getSubjectName(result.subject_id);
+
         if (!subjectGroups[subjectName]) {
             subjectGroups[subjectName] = [];
         }
+
         subjectGroups[subjectName].push(Number(result.percentage || 0));
     });
 
@@ -372,15 +435,18 @@ function renderSubjectAverageChart() {
     const averages = labels.map(label => {
         const list = subjectGroups[label];
         const total = list.reduce((sum, value) => sum + value, 0);
+
         return list.length ? (total / list.length).toFixed(2) : 0;
     });
 
-    if (subjectAverageChart) subjectAverageChart.destroy();
+    if (subjectAverageChart) {
+        subjectAverageChart.destroy();
+    }
 
     subjectAverageChart = new Chart(ctx, {
         type: "bar",
         data: {
-            labels,
+            labels: labels,
             datasets: [{
                 label: "Average %",
                 data: averages
@@ -390,7 +456,9 @@ function renderSubjectAverageChart() {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { display: false }
+                legend: {
+                    display: false
+                }
             },
             scales: {
                 y: {
@@ -402,9 +470,10 @@ function renderSubjectAverageChart() {
     });
 }
 
-// Teacher type chart shows how many teachers belong to each type
+// show teacher type chart
 function renderTeacherTypeChart() {
     const ctx = document.getElementById("teacherTypeChart");
+
     if (!ctx) return;
 
     const typeCounts = {};
@@ -414,7 +483,9 @@ function renderTeacherTypeChart() {
         typeCounts[type] = (typeCounts[type] || 0) + 1;
     });
 
-    if (teacherTypeChart) teacherTypeChart.destroy();
+    if (teacherTypeChart) {
+        teacherTypeChart.destroy();
+    }
 
     teacherTypeChart = new Chart(ctx, {
         type: "pie",
@@ -431,14 +502,14 @@ function renderTeacherTypeChart() {
     });
 }
 
-
-// ===============================
-// CLASSES
-// ===============================
-
+// show classes table
 function renderClasses() {
-    const search = document.getElementById("classSearch").value.toLowerCase();
+    const searchInput = document.getElementById("classSearch");
     const body = document.getElementById("classesBody");
+
+    if (!body) return;
+
+    const search = searchInput ? searchInput.value.toLowerCase() : "";
 
     const filtered = classes.filter(cls => {
         return `${cls.class_number} ${cls.section} ${cls.academic_year}`.toLowerCase().includes(search);
@@ -469,6 +540,7 @@ function renderClasses() {
     `).join("");
 }
 
+// open class form
 function openClassModal(classId = null) {
     const cls = classes.find(c => String(c.class_id) === String(classId));
 
@@ -480,11 +552,14 @@ function openClassModal(classId = null) {
             { name: "academic_year", label: "Academic Year", value: cls?.academic_year || "2026-27", required: true }
         ],
         async formData => {
+            // Convert class_number to integer just in case it's INT in DB
+            const cleaned = cleanFormData(formData, ["class_number"]);
+
             if (cls) {
-                await apiPut(`/api/classes/${classId}`, formData);
+                await apiPut(`/api/classes/${classId}`, cleaned);
                 showToast("Class updated successfully");
             } else {
-                await apiPost("/api/classes", formData);
+                await apiPost("/api/classes", cleaned);
                 showToast("Class added successfully");
             }
 
@@ -494,6 +569,7 @@ function openClassModal(classId = null) {
     );
 }
 
+// delete class
 async function deleteClass(classId) {
     if (!confirm("Are you sure you want to delete this class?")) return;
 
@@ -506,13 +582,14 @@ async function deleteClass(classId) {
     }
 }
 
-// ===============================
-// SUBJECTS
-// ===============================
-
+// show subjects table
 function renderSubjects() {
-    const search = document.getElementById("subjectSearch").value.toLowerCase();
+    const searchInput = document.getElementById("subjectSearch");
     const body = document.getElementById("subjectsBody");
+
+    if (!body) return;
+
+    const search = searchInput ? searchInput.value.toLowerCase() : "";
 
     const filtered = subjects.filter(subject => {
         return `${subject.subject_name} ${subject.subject_code}`.toLowerCase().includes(search);
@@ -543,8 +620,11 @@ function renderSubjects() {
     renderSubjectRecap();
 }
 
+// show subject result recap
 function renderSubjectRecap() {
     const recap = document.getElementById("subjectRecap");
+
+    if (!recap) return;
 
     if (results.length === 0) {
         recap.innerHTML = `<div class="recap-card">No result recap found.</div>`;
@@ -555,9 +635,11 @@ function renderSubjectRecap() {
 
     results.forEach(result => {
         const subjectId = result.subject_id;
+
         if (!subjectGroups[subjectId]) {
             subjectGroups[subjectId] = [];
         }
+
         subjectGroups[subjectId].push(result);
     });
 
@@ -569,16 +651,17 @@ function renderSubjectRecap() {
 
         return `
             <div class="recap-card">
-                <h3>${getSubjectName(subjectId)}</h3>
+                <h3>${safe(getSubjectName(subjectId))}</h3>
                 <div class="recap-row"><span>Term</span><strong>${safe(list[0].term)}</strong></div>
-                <div class="recap-row"><span>Total Records</span><strong>${list.length}</strong></div>
-                <div class="recap-row"><span>Total Marks</span><strong>${totalObtained}/${totalMarks}</strong></div>
-                <div class="recap-row"><span>Average</span><strong class="grade">${avg}%</strong></div>
+                <div class="recap-row"><span>Total Records</span><strong>${safe(list.length)}</strong></div>
+                <div class="recap-row"><span>Total Marks</span><strong>${safe(totalObtained)}/${safe(totalMarks)}</strong></div>
+                <div class="recap-row"><span>Average</span><strong class="grade">${safe(avg)}%</strong></div>
             </div>
         `;
     }).join("");
 }
 
+// open subject form
 function openSubjectModal(subjectId = null) {
     const subject = subjects.find(s => String(s.subject_id) === String(subjectId));
 
@@ -603,6 +686,7 @@ function openSubjectModal(subjectId = null) {
     );
 }
 
+// delete subject
 async function deleteSubject(subjectId) {
     if (!confirm("Are you sure you want to delete this subject?")) return;
 
@@ -615,19 +699,22 @@ async function deleteSubject(subjectId) {
     }
 }
 
-// ===============================
-// STUDENTS
-// ===============================
-
+// show students table
 function renderStudents() {
-    const search = document.getElementById("studentSearch").value.toLowerCase();
-    const classFilter = document.getElementById("studentClassFilter").value;
+    const searchInput = document.getElementById("studentSearch");
+    const classFilterInput = document.getElementById("studentClassFilter");
     const body = document.getElementById("studentsBody");
+
+    if (!body) return;
+
+    const search = searchInput ? searchInput.value.toLowerCase() : "";
+    const classFilter = classFilterInput ? classFilterInput.value : "";
 
     const filtered = students.filter(student => {
         const text = `${fullName(student)} ${student.email} ${student.roll_no} ${student.phone}`.toLowerCase();
         const matchSearch = text.includes(search);
         const matchClass = !classFilter || String(student.class_id) === String(classFilter);
+
         return matchSearch && matchClass;
     });
 
@@ -639,10 +726,10 @@ function renderStudents() {
     body.innerHTML = filtered.map(student => `
         <tr>
             <td data-label="ID">${safe(student.student_id)}</td>
-            <td data-label="Student">${fullName(student)}</td>
+            <td data-label="Student">${safe(fullName(student))}</td>
             <td data-label="Email">${safe(student.email)}</td>
             <td data-label="Roll No">${safe(student.roll_no)}</td>
-            <td data-label="Class">${getClassName(student.class_id)}</td>
+            <td data-label="Class">${safe(getClassName(student.class_id))}</td>
             <td data-label="Phone">${safe(student.phone)}</td>
             <td data-label="Actions">
                 <div class="action-group">
@@ -658,6 +745,7 @@ function renderStudents() {
     `).join("");
 }
 
+// open student form
 function openStudentModal(studentId = null) {
     const student = students.find(s => String(s.student_id) === String(studentId));
     const isEdit = Boolean(student);
@@ -686,27 +774,28 @@ function openStudentModal(studentId = null) {
         async formData => {
             try {
                 if (isEdit) {
-                    // Email is not updated because it is primary/unique key in person table
                     delete formData.email;
-
-                    // In backend you may have one combined student update route.
-                    // If your controller separates person and student update,
-                    // adjust this endpoint according to your route.
-                    await apiPut(`/api/students/${studentId}`, formData);
+                    // Convert integers for PostgreSQL
+                    const updateData = cleanFormData(formData, ["roll_no", "class_id"]);
+                    await apiPut(`/api/students/${studentId}`, updateData);
                     showToast("Student updated successfully");
                 } else {
-                    // Create person first
-                    const personData = pick(formData, [
-                        "email", "first_name", "last_name", "gender", "dob", "father_name",
-                        "phone", "street", "area", "postal_code", "city", "province", "country", "religion"
-                    ]);
+                    const personData = cleanFormData(
+                        pick(formData, [
+                            "email", "first_name", "last_name", "gender", "dob", "father_name",
+                            "phone", "street", "area", "postal_code", "city", "province", "country", "religion"
+                        ])
+                    );
 
                     await apiPost("/api/persons", personData);
 
-                    // Then create student with same email
-                    const studentData = pick(formData, ["email", "roll_no", "emergency_phone", "class_id"]);
-                    await apiPost("/api/students", studentData);
+                    // Convert integers for PostgreSQL
+                    const studentData = cleanFormData(
+                        pick(formData, ["email", "roll_no", "emergency_phone", "class_id"]),
+                        ["roll_no", "class_id"]
+                    );
 
+                    await apiPost("/api/students", studentData);
                     showToast("Student added successfully");
                 }
 
@@ -720,6 +809,7 @@ function openStudentModal(studentId = null) {
     );
 }
 
+// delete student
 async function deleteStudent(studentId) {
     if (!confirm("Are you sure you want to delete this student?")) return;
 
@@ -732,13 +822,14 @@ async function deleteStudent(studentId) {
     }
 }
 
-// ===============================
-// TEACHERS
-// ===============================
-
+// show teachers table
 function renderTeachers() {
-    const search = document.getElementById("teacherSearch").value.toLowerCase();
+    const searchInput = document.getElementById("teacherSearch");
     const body = document.getElementById("teachersBody");
+
+    if (!body) return;
+
+    const search = searchInput ? searchInput.value.toLowerCase() : "";
 
     const filtered = teachers.filter(teacher => {
         return `${fullName(teacher)} ${teacher.email} ${teacher.qualification} ${teacher.teacher_type}`.toLowerCase().includes(search);
@@ -752,7 +843,7 @@ function renderTeachers() {
     body.innerHTML = filtered.map(teacher => `
         <tr>
             <td data-label="ID">${safe(teacher.teacher_id)}</td>
-            <td data-label="Teacher">${fullName(teacher)}</td>
+            <td data-label="Teacher">${safe(fullName(teacher))}</td>
             <td data-label="Email">${safe(teacher.email)}</td>
             <td data-label="Qualification">${safe(teacher.qualification)}</td>
             <td data-label="Experience">${safe(teacher.experience_years)}</td>
@@ -771,6 +862,7 @@ function renderTeachers() {
     `).join("");
 }
 
+// open teacher form
 function openTeacherModal(teacherId = null) {
     const teacher = teachers.find(t => String(t.teacher_id) === String(teacherId));
     const isEdit = Boolean(teacher);
@@ -801,19 +893,27 @@ function openTeacherModal(teacherId = null) {
             try {
                 if (isEdit) {
                     delete formData.email;
-                    await apiPut(`/api/teachers/${teacherId}`, formData);
+                    // Convert integers for PostgreSQL
+                    const updateData = cleanFormData(formData, ["experience_years"]);
+                    await apiPut(`/api/teachers/${teacherId}`, updateData);
                     showToast("Teacher updated successfully");
                 } else {
-                    const personData = pick(formData, [
-                        "email", "first_name", "last_name", "gender", "dob", "father_name",
-                        "phone", "street", "area", "postal_code", "city", "province", "country", "religion"
-                    ]);
+                    const personData = cleanFormData(
+                        pick(formData, [
+                            "email", "first_name", "last_name", "gender", "dob", "father_name",
+                            "phone", "street", "area", "postal_code", "city", "province", "country", "religion"
+                        ])
+                    );
 
                     await apiPost("/api/persons", personData);
 
-                    const teacherData = pick(formData, [
-                        "email", "qualification", "experience_years", "teacher_type", "status"
-                    ]);
+                    // Convert integers for PostgreSQL
+                    const teacherData = cleanFormData(
+                        pick(formData, [
+                            "email", "qualification", "experience_years", "teacher_type", "status"
+                        ]),
+                        ["experience_years"]
+                    );
 
                     await apiPost("/api/teachers", teacherData);
                     showToast("Teacher added successfully");
@@ -829,6 +929,7 @@ function openTeacherModal(teacherId = null) {
     );
 }
 
+// delete teacher
 async function deleteTeacher(teacherId) {
     if (!confirm("Are you sure you want to delete this teacher?")) return;
 
@@ -841,13 +942,14 @@ async function deleteTeacher(teacherId) {
     }
 }
 
-// ===============================
-// EXAMS
-// ===============================
-
+// show exams table
 function renderExams() {
-    const search = document.getElementById("examSearch").value.toLowerCase();
+    const searchInput = document.getElementById("examSearch");
     const body = document.getElementById("examsBody");
+
+    if (!body) return;
+
+    const search = searchInput ? searchInput.value.toLowerCase() : "";
 
     const filtered = exams.filter(exam => {
         return `${exam.exam_name} ${exam.exam_type}`.toLowerCase().includes(search);
@@ -863,7 +965,7 @@ function renderExams() {
             <td data-label="ID">${safe(exam.exam_id)}</td>
             <td data-label="Exam Name">${safe(exam.exam_name)}</td>
             <td data-label="Type">${safe(exam.exam_type)}</td>
-            <td data-label="Date">${formatDate(exam.exam_date)}</td>
+            <td data-label="Date">${safe(formatDate(exam.exam_date))}</td>
             <td data-label="Total Marks">${safe(exam.total_marks)}</td>
             <td data-label="Actions">
                 <div class="action-group">
@@ -879,6 +981,7 @@ function renderExams() {
     `).join("");
 }
 
+// open exam form
 function openExamModal(examId = null) {
     const exam = exams.find(e => String(e.exam_id) === String(examId));
 
@@ -891,11 +994,14 @@ function openExamModal(examId = null) {
             { name: "total_marks", label: "Total Marks", type: "number", value: exam?.total_marks || 100, required: true }
         ],
         async formData => {
+            // Convert integers for PostgreSQL
+            const cleaned = cleanFormData(formData, ["total_marks"]);
+
             if (exam) {
-                await apiPut(`/api/exams/${examId}`, formData);
+                await apiPut(`/api/exams/${examId}`, cleaned);
                 showToast("Exam updated successfully");
             } else {
-                await apiPost("/api/exams", formData);
+                await apiPost("/api/exams", cleaned);
                 showToast("Exam added successfully");
             }
 
@@ -905,6 +1011,7 @@ function openExamModal(examId = null) {
     );
 }
 
+// delete exam
 async function deleteExam(examId) {
     if (!confirm("Are you sure you want to delete this exam?")) return;
 
@@ -917,8 +1024,11 @@ async function deleteExam(examId) {
     }
 }
 
+// show exam schedules
 function renderExamSchedules() {
     const body = document.getElementById("examScheduleBody");
+
+    if (!body) return;
 
     if (schedules.length === 0) {
         body.innerHTML = `<tr><td colspan="7">No exam schedules found.</td></tr>`;
@@ -931,26 +1041,29 @@ function renderExamSchedules() {
             <td data-label="Exam">${safe(schedule.exam_name || getExamName(schedule.exam_id))}</td>
             <td data-label="Class">${safe(schedule.class_number && schedule.section ? `${schedule.class_number}-${schedule.section}` : getClassName(schedule.class_id))}</td>
             <td data-label="Subject">${safe(schedule.subject_name || getSubjectName(schedule.subject_id))}</td>
-            <td data-label="Date">${formatDate(schedule.schedule_date)}</td>
+            <td data-label="Date">${safe(formatDate(schedule.schedule_date))}</td>
             <td data-label="Time">${safe(schedule.start_time)} - ${safe(schedule.end_time)}</td>
             <td data-label="Status">${safe(schedule.status)}</td>
         </tr>
     `).join("");
 }
 
-// ===============================
-// RESULTS + REPORT CARDS
-// ===============================
-
+// show results
 function renderResults() {
-    const search = document.getElementById("resultSearch").value.toLowerCase();
-    const classFilter = document.getElementById("resultClassFilter").value;
+    const searchInput = document.getElementById("resultSearch");
+    const classFilterInput = document.getElementById("resultClassFilter");
     const body = document.getElementById("resultsBody");
+
+    if (!body) return;
+
+    const search = searchInput ? searchInput.value.toLowerCase() : "";
+    const classFilter = classFilterInput ? classFilterInput.value : "";
 
     const filtered = results.filter(result => {
         const text = `${result.first_name} ${result.last_name} ${result.student_name} ${result.subject_name} ${result.grade} ${result.term}`.toLowerCase();
         const matchSearch = text.includes(search);
         const matchClass = !classFilter || String(result.class_id) === String(classFilter);
+
         return matchSearch && matchClass;
     });
 
@@ -973,9 +1086,14 @@ function renderResults() {
     `).join("");
 }
 
+// show report cards
 function renderReportCards() {
-    const search = document.getElementById("reportSearch").value.toLowerCase();
+    const searchInput = document.getElementById("reportSearch");
     const container = document.getElementById("reportCardsBody");
+
+    if (!container) return;
+
+    const search = searchInput ? searchInput.value.toLowerCase() : "";
 
     const filtered = reportCards.filter(card => {
         return `${card.first_name} ${card.last_name} ${card.student_name} ${card.overall_grade} ${card.term}`.toLowerCase().includes(search);
@@ -1000,11 +1118,7 @@ function renderReportCards() {
     `).join("");
 }
 
-
-// ===============================
-// ATTENDANCE
-// ===============================
-
+// show attendance
 function renderAttendance() {
     renderAttendanceSummary();
     renderAttendanceTable();
@@ -1012,6 +1126,7 @@ function renderAttendance() {
     renderAttendanceCharts();
 }
 
+// show attendance cards
 function renderAttendanceSummary() {
     const present = attendance.filter(item => String(item.status).toLowerCase() === "present").length;
     const absent = attendance.filter(item => String(item.status).toLowerCase() === "absent").length;
@@ -1022,17 +1137,15 @@ function renderAttendanceSummary() {
 
     const avgMarks = attendanceMarks.length ? (totalMarks / attendanceMarks.length).toFixed(2) : 0;
 
-    const presentEl = document.getElementById("presentCount");
-    const absentEl = document.getElementById("absentCount");
-    const avgEl = document.getElementById("averageAttendanceMarks");
-
-    if (presentEl) presentEl.textContent = present;
-    if (absentEl) absentEl.textContent = absent;
-    if (avgEl) avgEl.textContent = avgMarks;
+    setText("presentCount", present);
+    setText("absentCount", absent);
+    setText("averageAttendanceMarks", avgMarks);
 }
 
+// show attendance table
 function renderAttendanceTable() {
     const body = document.getElementById("attendanceBody");
+
     if (!body) return;
 
     if (attendance.length === 0) {
@@ -1052,8 +1165,10 @@ function renderAttendanceTable() {
     `).join("");
 }
 
+// show attendance marks table
 function renderAttendanceMarksTable() {
     const body = document.getElementById("attendanceMarksBody");
+
     if (!body) return;
 
     if (attendanceMarks.length === 0) {
@@ -1075,6 +1190,7 @@ function renderAttendanceMarksTable() {
     `).join("");
 }
 
+// show attendance charts
 function renderAttendanceCharts() {
     const statusCanvas = document.getElementById("attendanceStatusChart");
     const marksCanvas = document.getElementById("attendanceMarksChart");
@@ -1085,7 +1201,9 @@ function renderAttendanceCharts() {
     const absent = attendance.filter(item => String(item.status).toLowerCase() === "absent").length;
     const other = attendance.length - present - absent;
 
-    if (attendanceStatusChart) attendanceStatusChart.destroy();
+    if (attendanceStatusChart) {
+        attendanceStatusChart.destroy();
+    }
 
     attendanceStatusChart = new Chart(statusCanvas, {
         type: "doughnut",
@@ -1105,25 +1223,31 @@ function renderAttendanceCharts() {
 
     attendanceMarks.forEach(item => {
         const term = item.term || "Unknown";
+
         if (!termGroups[term]) {
             termGroups[term] = [];
         }
+
         termGroups[term].push(Number(item.total_attendance_marks || 0));
     });
 
     const labels = Object.keys(termGroups);
+
     const averages = labels.map(term => {
         const list = termGroups[term];
         const total = list.reduce((sum, value) => sum + value, 0);
+
         return list.length ? (total / list.length).toFixed(2) : 0;
     });
 
-    if (attendanceMarksChart) attendanceMarksChart.destroy();
+    if (attendanceMarksChart) {
+        attendanceMarksChart.destroy();
+    }
 
     attendanceMarksChart = new Chart(marksCanvas, {
         type: "bar",
         data: {
-            labels,
+            labels: labels,
             datasets: [{
                 label: "Average Attendance Marks",
                 data: averages
@@ -1133,7 +1257,9 @@ function renderAttendanceCharts() {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { display: false }
+                legend: {
+                    display: false
+                }
             },
             scales: {
                 y: {
@@ -1144,140 +1270,17 @@ function renderAttendanceCharts() {
     });
 }
 
-// ===============================
-// REUSABLE MODAL FORM
-// ===============================
-
-function openModal(title, fields, onSubmit) {
-    const modal = document.getElementById("formModal");
-    const modalTitle = document.getElementById("modalTitle");
-    const form = document.getElementById("dynamicForm");
-
-    modalTitle.textContent = title;
-
-    form.innerHTML = fields.map(field => createFormField(field)).join("") + `
-        <div class="form-actions">
-            <button type="button" class="btn light" onclick="closeModal()">Cancel</button>
-            <button type="submit" class="btn primary">
-                <i class="fa-solid fa-floppy-disk"></i> Save
-            </button>
-        </div>
-    `;
-
-    form.onsubmit = async event => {
-        event.preventDefault();
-
-        const formData = {};
-        fields.forEach(field => {
-            const input = form.querySelector(`[name="${field.name}"]`);
-            if (input && !field.disabled) {
-                formData[field.name] = input.value;
-            }
-        });
-
-        try {
-            await onSubmit(formData);
-        } catch (error) {
-            showToast(error.message, "error");
-        }
-    };
-
-    modal.classList.add("show");
-}
-
-function createFormField(field) {
-    const type = field.type || "text";
-    const required = field.required ? "required" : "";
-    const disabled = field.disabled ? "disabled" : "";
-    const value = field.value ?? "";
-
-    if (type === "select") {
-        const options = Array.isArray(field.options) ? field.options : [];
-
-        const optionHtml = options.map(option => {
-            if (typeof option === "object") {
-                return `<option value="${option.value}" ${String(option.value) === String(value) ? "selected" : ""}>${option.label}</option>`;
-            }
-
-            return `<option value="${option}" ${String(option) === String(value) ? "selected" : ""}>${option}</option>`;
-        }).join("");
-
-        return `
-            <div class="form-group">
-                <label>${field.label}</label>
-                <select name="${field.name}" ${required} ${disabled}>
-                    <option value="">Select ${field.label}</option>
-                    ${optionHtml}
-                </select>
-            </div>
-        `;
-    }
-
-    return `
-        <div class="form-group">
-            <label>${field.label}</label>
-            <input 
-                type="${type}" 
-                name="${field.name}" 
-                value="${safe(value)}" 
-                ${required} 
-                ${disabled}
-            >
-        </div>
-    `;
-}
-
-function closeModal() {
-    document.getElementById("formModal").classList.remove("show");
-}
-
-// Pick selected keys from object
-function pick(obj, keys) {
-    const newObj = {};
-    keys.forEach(key => {
-        newObj[key] = obj[key];
-    });
-    return newObj;
-}
-
-// ===============================
-// DROPDOWNS
-// ===============================
-
-function classOptions() {
-    return classes.map(cls => ({
-        value: cls.class_id,
-        label: `${cls.class_number}-${cls.section} (${cls.academic_year})`
-    }));
-}
-
-function fillClassDropdowns() {
-    const studentFilter = document.getElementById("studentClassFilter");
-    const resultFilter = document.getElementById("resultClassFilter");
-
-    const options = classes.map(cls => `
-        <option value="${cls.class_id}">${cls.class_number}-${cls.section} (${cls.academic_year})</option>
-    `).join("");
-
-    studentFilter.innerHTML = `<option value="">All Classes</option>${options}`;
-    resultFilter.innerHTML = `<option value="">All Classes</option>${options}`;
-}
-
-// ===============================
-// MARKS EDIT REQUEST
-// ===============================
-
-// get full name from request data
+// get student name from marks request
 function requestStudentName(item) {
     return `${item.student_first_name || ""} ${item.student_last_name || ""}`.trim() || "N/A";
 }
 
-// get teacher name from request data
+// get teacher name from marks request
 function requestTeacherName(item) {
     return `${item.teacher_first_name || ""} ${item.teacher_last_name || ""}`.trim() || "N/A";
 }
 
-// show marks edit request records, cards and chart
+// show marks edit requests
 function renderMarksEditRequests() {
     const pending = marksEditRequests.filter(item => {
         return String(item.approval_status).toLowerCase() === "pending";
@@ -1291,15 +1294,15 @@ function renderMarksEditRequests() {
         return String(item.approval_status).toLowerCase() === "rejected";
     }).length;
 
-    document.getElementById("pendingRequests").textContent = pending;
-    document.getElementById("approvedRequests").textContent = approved;
-    document.getElementById("rejectedRequests").textContent = rejected;
+    setText("pendingRequests", pending);
+    setText("approvedRequests", approved);
+    setText("rejectedRequests", rejected);
 
     renderMarksRequestsTable();
     renderMarksRequestsChart(pending, approved, rejected);
 }
 
-// show marks edit request table
+// show marks edit requests table
 function renderMarksRequestsTable() {
     const body = document.getElementById("marksRequestsBody");
 
@@ -1321,7 +1324,7 @@ function renderMarksRequestsTable() {
             <td data-label="New">${safe(item.new_marks)}</td>
             <td data-label="Reason">${safe(item.reason)}</td>
             <td data-label="Status">${safe(item.approval_status)}</td>
-            <td data-label="Request Date">${formatDate(item.request_date)}</td>
+            <td data-label="Request Date">${safe(formatDate(item.request_date))}</td>
         </tr>
     `).join("");
 }
@@ -1351,8 +1354,377 @@ function renderMarksRequestsChart(pending, approved, rejected) {
     });
 }
 
-// ===============================
-// START APP
-// ===============================
+// open reusable modal
+function openModal(title, fields, onSubmit) {
+    const modal = document.getElementById("formModal");
+    const modalTitle = document.getElementById("modalTitle");
+    const form = document.getElementById("dynamicForm");
 
+    if (!modal || !modalTitle || !form) {
+        showToast("Modal elements are missing", "error");
+        return;
+    }
+
+    modalTitle.textContent = title;
+
+    form.innerHTML = fields.map(field => createFormField(field)).join("") + `
+        <div class="form-actions">
+            <button type="button" class="btn light" onclick="closeModal()">Cancel</button>
+            <button type="submit" class="btn primary">
+                <i class="fa-solid fa-floppy-disk"></i> Save
+            </button>
+        </div>
+    `;
+
+    form.onsubmit = async event => {
+        event.preventDefault();
+
+        const formData = {};
+
+        fields.forEach(field => {
+            const input = form.querySelector(`[name="${field.name}"]`);
+
+            if (input && !field.disabled) {
+                formData[field.name] = input.value;
+            }
+        });
+
+        try {
+            await onSubmit(formData);
+        } catch (error) {
+            showToast(error.message, "error");
+        }
+    };
+
+    modal.classList.add("show");
+}
+
+// create form input fields
+function createFormField(field) {
+    const type = field.type || "text";
+    const required = field.required ? "required" : "";
+    const disabled = field.disabled ? "disabled" : "";
+    const value = field.value ?? "";
+
+    if (type === "select") {
+        const options = Array.isArray(field.options) ? field.options : [];
+
+        const optionHtml = options.map(option => {
+            if (typeof option === "object") {
+                return `<option value="${safe(option.value)}" ${String(option.value) === String(value) ? "selected" : ""}>${safe(option.label)}</option>`;
+            }
+
+            return `<option value="${safe(option)}" ${String(option) === String(value) ? "selected" : ""}>${safe(option)}</option>`;
+        }).join("");
+
+        return `
+            <div class="form-group">
+                <label>${safe(field.label)}</label>
+                <select name="${safe(field.name)}" ${required} ${disabled}>
+                    <option value="">Select ${safe(field.label)}</option>
+                    ${optionHtml}
+                </select>
+            </div>
+        `;
+    }
+
+    return `
+        <div class="form-group">
+            <label>${safe(field.label)}</label>
+            <input 
+                type="${safe(type)}" 
+                name="${safe(field.name)}" 
+                value="${safe(value)}" 
+                ${required} 
+                ${disabled}
+            >
+        </div>
+    `;
+}
+
+// close modal
+function closeModal() {
+    const modal = document.getElementById("formModal");
+
+    if (modal) {
+        modal.classList.remove("show");
+    }
+}
+
+// pick selected fields from object
+function pick(obj, keys) {
+    const newObj = {};
+
+    keys.forEach(key => {
+        newObj[key] = obj[key];
+    });
+
+    return newObj;
+}
+
+// Clean form data - convert types and remove empty optional fields
+function cleanFormData(data, intFields = []) {
+    const cleaned = { ...data };
+
+    // Convert specified fields to integers for PostgreSQL
+    intFields.forEach(field => {
+        if (cleaned[field] !== undefined && cleaned[field] !== "") {
+            cleaned[field] = parseInt(cleaned[field], 10);
+        }
+    });
+
+    // Convert empty strings to null for optional database fields
+    // This prevents sending "" to PostgreSQL where it expects NULL
+    Object.keys(cleaned).forEach(key => {
+        if (cleaned[key] === "") {
+            cleaned[key] = null;
+        }
+    });
+
+    return cleaned;
+}
+
+// get class dropdown options
+function classOptions() {
+    return classes.map(cls => ({
+        value: cls.class_id,
+        label: `${cls.class_number}-${cls.section} (${cls.academic_year})`
+    }));
+}
+
+// fill class dropdowns
+function fillClassDropdowns() {
+    const studentFilter = document.getElementById("studentClassFilter");
+    const resultFilter = document.getElementById("resultClassFilter");
+
+    const options = classes.map(cls => `
+        <option value="${safe(cls.class_id)}">
+            ${safe(cls.class_number)}-${safe(cls.section)} (${safe(cls.academic_year)})
+        </option>
+    `).join("");
+
+    if (studentFilter) {
+        studentFilter.innerHTML = `<option value="">All Classes</option>${options}`;
+    }
+
+    if (resultFilter) {
+        resultFilter.innerHTML = `<option value="">All Classes</option>${options}`;
+    }
+}
+
+// get schedule label
+function getScheduleLabel(scheduleId) {
+    const schedule = schedules.find(item => {
+        return String(item.schedule_id) === String(scheduleId);
+    });
+
+    if (!schedule) return scheduleId || "N/A";
+
+    const examName = schedule.exam_name || getExamName(schedule.exam_id);
+    const subjectName = schedule.subject_name || getSubjectName(schedule.subject_id);
+    const className = schedule.class_number && schedule.section
+        ? `${schedule.class_number}-${schedule.section}`
+        : getClassName(schedule.class_id);
+
+    return `${examName} | ${subjectName} | ${className}`;
+}
+
+// fill seat schedule dropdown
+function fillSeatScheduleDropdown() {
+    const seatScheduleFilter = document.getElementById("seatScheduleFilter");
+
+    if (!seatScheduleFilter) return;
+
+    const options = schedules.map(schedule => `
+        <option value="${safe(schedule.schedule_id)}">
+            ${safe(getScheduleLabel(schedule.schedule_id))}
+        </option>
+    `).join("");
+
+    seatScheduleFilter.innerHTML = `<option value="">All Schedules</option>${options}`;
+}
+
+// show seat allocation records
+function renderSeatAllocations() {
+    const body = document.getElementById("seatAllocationBody");
+    const searchInput = document.getElementById("seatSearch");
+    const scheduleFilterInput = document.getElementById("seatScheduleFilter");
+
+    if (!body) return;
+
+    const search = searchInput ? searchInput.value.toLowerCase() : "";
+    const scheduleFilter = scheduleFilterInput ? scheduleFilterInput.value : "";
+
+    const filtered = seatAllocations.filter(item => {
+        const studentName = `${item.first_name || ""} ${item.last_name || ""}`;
+        const className = item.class_number && item.section
+            ? `${item.class_number}-${item.section}`
+            : getClassName(item.class_id);
+
+        const text = `
+            ${studentName}
+            ${item.seat_no}
+            ${item.roll_no}
+            ${item.exam_name}
+            ${item.subject_name}
+            ${className}
+        `.toLowerCase();
+
+        const matchSearch = text.includes(search);
+        const matchSchedule = !scheduleFilter || String(item.schedule_id) === String(scheduleFilter);
+
+        return matchSearch && matchSchedule;
+    });
+
+    setText("totalSeats", seatAllocations.length);
+
+    const uniqueSchedules = new Set(seatAllocations.map(item => item.schedule_id));
+    const uniqueStudents = new Set(seatAllocations.map(item => item.student_id));
+
+    setText("seatSchedules", uniqueSchedules.size);
+    setText("seatedStudents", uniqueStudents.size);
+
+    if (filtered.length === 0) {
+        body.innerHTML = `<tr><td colspan="9">No seat allocations found.</td></tr>`;
+    } else {
+        body.innerHTML = filtered.map(item => `
+            <tr>
+                <td data-label="ID">${safe(item.seat_allocation_id)}</td>
+                <td data-label="Seat No">${safe(item.seat_no)}</td>
+                <td data-label="Student">${safe(`${item.first_name || ""} ${item.last_name || ""}`.trim() || getStudentName(item.student_id))}</td>
+                <td data-label="Roll No">${safe(item.roll_no)}</td>
+                <td data-label="Exam">${safe(item.exam_name || getExamName(item.exam_id))}</td>
+                <td data-label="Subject">${safe(item.subject_name || getSubjectName(item.subject_id))}</td>
+                <td data-label="Class">${safe(item.class_number && item.section ? `${item.class_number}-${item.section}` : getClassName(item.class_id))}</td>
+                <td data-label="Schedule Date">${safe(formatDate(item.schedule_date))}</td>
+                <td data-label="Actions">
+                    <div class="action-group">
+                        <button class="btn light" onclick="openSeatModal(${item.seat_allocation_id})">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button class="btn danger" onclick="deleteSeatAllocation(${item.seat_allocation_id})">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `).join("");
+    }
+
+    renderSeatAllocationChart();
+}
+
+// show seat allocation chart
+function renderSeatAllocationChart() {
+    const canvas = document.getElementById("seatAllocationChart");
+
+    if (!canvas) return;
+
+    const scheduleGroups = {};
+
+    seatAllocations.forEach(item => {
+        const label = getScheduleLabel(item.schedule_id);
+        scheduleGroups[label] = (scheduleGroups[label] || 0) + 1;
+    });
+
+    if (seatAllocationChart) {
+        seatAllocationChart.destroy();
+    }
+
+    seatAllocationChart = new Chart(canvas, {
+        type: "bar",
+        data: {
+            labels: Object.keys(scheduleGroups),
+            datasets: [{
+                label: "Allocated Seats",
+                data: Object.values(scheduleGroups)
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+// open seat allocation form
+function openSeatModal(seatAllocationId = null) {
+    const seat = seatAllocations.find(item => {
+        return String(item.seat_allocation_id) === String(seatAllocationId);
+    });
+
+    openModal(
+        seat ? "Update Seat Allocation" : "Allocate Seat",
+        [
+            {
+                name: "schedule_id",
+                label: "Exam Schedule",
+                type: "select",
+                value: seat?.schedule_id || "",
+                options: schedules.map(schedule => ({
+                    value: schedule.schedule_id,
+                    label: getScheduleLabel(schedule.schedule_id)
+                })),
+                required: true
+            },
+            {
+                name: "student_id",
+                label: "Student",
+                type: "select",
+                value: seat?.student_id || "",
+                options: students.map(student => ({
+                    value: student.student_id,
+                    label: `${fullName(student)} | Roll No: ${student.roll_no}`
+                })),
+                required: true
+            },
+            {
+                name: "seat_no",
+                label: "Seat No",
+                value: seat?.seat_no || "",
+                required: true
+            }
+        ],
+        async formData => {
+            // Convert integers for PostgreSQL
+            const cleaned = cleanFormData(formData, ["schedule_id", "student_id"]);
+
+            if (seat) {
+                await apiPut(`/api/seat-allocations/${seatAllocationId}`, cleaned);
+                showToast("Seat allocation updated successfully");
+            } else {
+                await apiPost("/api/seat-allocations", cleaned);
+                showToast("Seat allocated successfully");
+            }
+
+            closeModal();
+            await loadAllData();
+        }
+    );
+}
+
+// delete seat allocation
+async function deleteSeatAllocation(seatAllocationId) {
+    if (!confirm("Are you sure you want to delete this seat allocation?")) return;
+
+    try {
+        await apiDelete(`/api/seat-allocations/${seatAllocationId}`);
+        showToast("Seat allocation deleted successfully");
+        await loadAllData();
+    } catch (error) {
+        showToast(error.message, "error");
+    }
+}
+
+// start app
 loadAllData();

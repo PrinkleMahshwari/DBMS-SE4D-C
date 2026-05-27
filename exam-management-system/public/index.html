@@ -16,14 +16,24 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Mobile overlay, when sidebar opens -->
+    <!-- Skip link for keyboard users -->
+    <a href="#dashboard" class="sr-only focusable">Skip to main content</a>
+
+    <!-- Message if JavaScript is disabled -->
+    <noscript>
+        <p style="text-align:center;padding:2rem;">
+            This application requires JavaScript to work. Please enable it in your browser.
+        </p>
+    </noscript>
+
+    <!-- Mobile overlay -->
     <div class="overlay" id="overlay"></div>
 
-    <!-- Sidebar Navigation -->
+    <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="brand">
             <div class="brand-icon">
-                <i class="fa-solid fa-graduation-cap"></i>
+                <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i>
             </div>
             <div>
                 <h2>SEMS</h2>
@@ -31,46 +41,49 @@
             </div>
         </div>
 
-        <nav class="side-nav">
-            <a href="#" class="nav-link active" data-page="dashboard">
-                <i class="fa-solid fa-chart-line"></i> Dashboard
+        <nav class="side-nav" aria-label="Main navigation">
+            <a href="#!" class="nav-link active" data-page="dashboard">
+                <i class="fa-solid fa-chart-line" aria-hidden="true"></i> Dashboard
             </a>
-            <a href="#" class="nav-link" data-page="students">
-                <i class="fa-solid fa-user-graduate"></i> Students
+            <a href="#!" class="nav-link" data-page="students">
+                <i class="fa-solid fa-user-graduate" aria-hidden="true"></i> Students
             </a>
-            <a href="#" class="nav-link" data-page="teachers">
-                <i class="fa-solid fa-chalkboard-user"></i> Teachers
+            <a href="#!" class="nav-link" data-page="teachers">
+                <i class="fa-solid fa-chalkboard-user" aria-hidden="true"></i> Teachers
             </a>
-            <a href="#" class="nav-link" data-page="classes">
-                <i class="fa-solid fa-school"></i> Classes
+            <a href="#!" class="nav-link" data-page="classes">
+                <i class="fa-solid fa-school" aria-hidden="true"></i> Classes
             </a>
-            <a href="#" class="nav-link" data-page="subjects">
-                <i class="fa-solid fa-book-open"></i> Subjects
+            <a href="#!" class="nav-link" data-page="subjects">
+                <i class="fa-solid fa-book-open" aria-hidden="true"></i> Subjects
             </a>
-            <a href="#" class="nav-link" data-page="exams">
-                <i class="fa-solid fa-file-pen"></i> Exams
+            <a href="#!" class="nav-link" data-page="exams">
+                <i class="fa-solid fa-file-pen" aria-hidden="true"></i> Exams
             </a>
-            <a href="#" class="nav-link" data-page="results">
-                <i class="fa-solid fa-square-poll-vertical"></i> Results
+            <a href="#!" class="nav-link" data-page="results">
+                <i class="fa-solid fa-square-poll-vertical" aria-hidden="true"></i> Results
             </a>
-            <a href="#" class="nav-link" data-page="reports">
-                <i class="fa-solid fa-file-lines"></i> Report Cards
+            <a href="#!" class="nav-link" data-page="reports">
+                <i class="fa-solid fa-file-lines" aria-hidden="true"></i> Report Cards
             </a>
-            <a href="#" class="nav-link" data-page="attendance">
-                <i class="fa-solid fa-clipboard-check"></i> Attendance
+            <a href="#!" class="nav-link" data-page="attendance">
+                <i class="fa-solid fa-clipboard-check" aria-hidden="true"></i> Attendance
             </a>
-            <a href="#" class="nav-link" data-page="marksRequests">
-                <i class="fa-solid fa-pen-to-square"></i> Marks Edit Requests
+            <a href="#!" class="nav-link" data-page="seatAllocation">
+                <i class="fa-solid fa-chair" aria-hidden="true"></i> Seat Allocation
+            </a>
+            <a href="#!" class="nav-link" data-page="marksRequests">
+                <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i> Marks Edit Requests
             </a>
         </nav>
     </aside>
 
-    <!-- Main Area -->
-    <main class="main-content">
-        <!-- Top Navbar -->
+    <!-- Main content -->
+    <main class="main-content" id="mainContent">
+        <!-- Topbar -->
         <header class="topbar">
-            <button class="hamburger" id="hamburgerBtn" title="Open menu">
-                <i class="fa-solid fa-bars"></i>
+            <button class="hamburger" id="hamburgerBtn" aria-label="Open navigation menu" title="Open menu">
+                <i class="fa-solid fa-bars" aria-hidden="true"></i>
             </button>
 
             <div>
@@ -79,20 +92,20 @@
             </div>
 
             <div class="topbar-right">
-                <span class="status-pill">
-                    <i class="fa-solid fa-circle"></i> API Connected
+                <span class="status-pill" id="apiStatus">
+                    <i class="fa-solid fa-circle" aria-hidden="true"></i> API Connected
                 </span>
             </div>
         </header>
 
-        <!-- Toast Message -->
-        <div class="toast" id="toast"></div>
+        <!-- Toast message -->
+        <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-        <!-- Dashboard Page -->
+        <!-- Dashboard page -->
         <section class="page active" id="dashboard">
             <div class="stats-grid">
                 <div class="stat-card">
-                    <i class="fa-solid fa-user-graduate"></i>
+                    <i class="fa-solid fa-user-graduate" aria-hidden="true"></i>
                     <div>
                         <span id="totalStudents">0</span>
                         <p>Total Students</p>
@@ -100,7 +113,7 @@
                 </div>
 
                 <div class="stat-card">
-                    <i class="fa-solid fa-chalkboard-user"></i>
+                    <i class="fa-solid fa-chalkboard-user" aria-hidden="true"></i>
                     <div>
                         <span id="totalTeachers">0</span>
                         <p>Total Teachers</p>
@@ -108,7 +121,7 @@
                 </div>
 
                 <div class="stat-card">
-                    <i class="fa-solid fa-school"></i>
+                    <i class="fa-solid fa-school" aria-hidden="true"></i>
                     <div>
                         <span id="totalClasses">0</span>
                         <p>Total Classes</p>
@@ -116,7 +129,7 @@
                 </div>
 
                 <div class="stat-card">
-                    <i class="fa-solid fa-book"></i>
+                    <i class="fa-solid fa-book" aria-hidden="true"></i>
                     <div>
                         <span id="totalSubjects">0</span>
                         <p>Total Subjects</p>
@@ -124,7 +137,7 @@
                 </div>
 
                 <div class="stat-card">
-                    <i class="fa-solid fa-file-pen"></i>
+                    <i class="fa-solid fa-file-pen" aria-hidden="true"></i>
                     <div>
                         <span id="totalExams">0</span>
                         <p>Total Exams</p>
@@ -132,7 +145,7 @@
                 </div>
 
                 <div class="stat-card">
-                    <i class="fa-solid fa-clipboard-check"></i>
+                    <i class="fa-solid fa-clipboard-check" aria-hidden="true"></i>
                     <div>
                         <span id="totalAttendance">0</span>
                         <p>Attendance Records</p>
@@ -140,7 +153,7 @@
                 </div>
 
                 <div class="stat-card">
-                    <i class="fa-solid fa-file-lines"></i>
+                    <i class="fa-solid fa-file-lines" aria-hidden="true"></i>
                     <div>
                         <span id="totalReportCards">0</span>
                         <p>Report Cards</p>
@@ -191,7 +204,7 @@
             </div>
         </section>
 
-        <!-- Students Page -->
+        <!-- Students page -->
         <section class="page" id="students">
             <div class="section-toolbar">
                 <div>
@@ -199,12 +212,15 @@
                     <p>Person data + student specific data are handled together.</p>
                 </div>
                 <button class="btn primary" onclick="openStudentModal()">
-                    <i class="fa-solid fa-plus"></i> Add Student
+                    <i class="fa-solid fa-plus" aria-hidden="true"></i> Add Student
                 </button>
             </div>
 
             <div class="filters">
+                <label for="studentSearch" class="sr-only">Search students</label>
                 <input type="search" id="studentSearch" placeholder="Search student by name, email, roll no..." oninput="renderStudents()">
+
+                <label for="studentClassFilter" class="sr-only">Filter by class</label>
                 <select id="studentClassFilter" onchange="renderStudents()">
                     <option value="">All Classes</option>
                 </select>
@@ -230,7 +246,7 @@
             </div>
         </section>
 
-        <!-- Teachers Page -->
+        <!-- Teachers page -->
         <section class="page" id="teachers">
             <div class="section-toolbar">
                 <div>
@@ -238,11 +254,12 @@
                     <p>Teacher data also uses person table plus teacher table.</p>
                 </div>
                 <button class="btn primary" onclick="openTeacherModal()">
-                    <i class="fa-solid fa-plus"></i> Add Teacher
+                    <i class="fa-solid fa-plus" aria-hidden="true"></i> Add Teacher
                 </button>
             </div>
 
             <div class="filters">
+                <label for="teacherSearch" class="sr-only">Search teachers</label>
                 <input type="search" id="teacherSearch" placeholder="Search teacher by name, email, type..." oninput="renderTeachers()">
             </div>
 
@@ -266,7 +283,7 @@
             </div>
         </section>
 
-        <!-- Classes Page -->
+        <!-- Classes page -->
         <section class="page" id="classes">
             <div class="section-toolbar">
                 <div>
@@ -274,11 +291,12 @@
                     <p>Manage class number, section, and academic year.</p>
                 </div>
                 <button class="btn primary" onclick="openClassModal()">
-                    <i class="fa-solid fa-plus"></i> Add Class
+                    <i class="fa-solid fa-plus" aria-hidden="true"></i> Add Class
                 </button>
             </div>
 
             <div class="filters">
+                <label for="classSearch" class="sr-only">Search classes</label>
                 <input type="search" id="classSearch" placeholder="Search class, section, year..." oninput="renderClasses()">
             </div>
 
@@ -300,7 +318,7 @@
             </div>
         </section>
 
-        <!-- Subjects Page -->
+        <!-- Subjects page -->
         <section class="page" id="subjects">
             <div class="section-toolbar">
                 <div>
@@ -308,11 +326,12 @@
                     <p>Manage subjects and view subject result recap.</p>
                 </div>
                 <button class="btn primary" onclick="openSubjectModal()">
-                    <i class="fa-solid fa-plus"></i> Add Subject
+                    <i class="fa-solid fa-plus" aria-hidden="true"></i> Add Subject
                 </button>
             </div>
 
             <div class="filters">
+                <label for="subjectSearch" class="sr-only">Search subjects</label>
                 <input type="search" id="subjectSearch" placeholder="Search subject or code..." oninput="renderSubjects()">
             </div>
 
@@ -339,7 +358,7 @@
             <div class="recap-grid" id="subjectRecap"></div>
         </section>
 
-        <!-- Exams Page -->
+        <!-- Exams page -->
         <section class="page" id="exams">
             <div class="section-toolbar">
                 <div>
@@ -347,11 +366,12 @@
                     <p>Manage exam info. Schedule and components are shown below.</p>
                 </div>
                 <button class="btn primary" onclick="openExamModal()">
-                    <i class="fa-solid fa-plus"></i> Add Exam
+                    <i class="fa-solid fa-plus" aria-hidden="true"></i> Add Exam
                 </button>
             </div>
 
             <div class="filters">
+                <label for="examSearch" class="sr-only">Search exams</label>
                 <input type="search" id="examSearch" placeholder="Search exam name or type..." oninput="renderExams()">
             </div>
 
@@ -398,7 +418,7 @@
             </div>
         </section>
 
-        <!-- Results Page -->
+        <!-- Results page -->
         <section class="page" id="results">
             <div class="section-toolbar">
                 <div>
@@ -408,7 +428,10 @@
             </div>
 
             <div class="filters">
+                <label for="resultSearch" class="sr-only">Search results</label>
                 <input type="search" id="resultSearch" placeholder="Search student, subject, grade..." oninput="renderResults()">
+
+                <label for="resultClassFilter" class="sr-only">Filter by class</label>
                 <select id="resultClassFilter" onchange="renderResults()">
                     <option value="">All Classes</option>
                 </select>
@@ -435,7 +458,7 @@
             </div>
         </section>
 
-        <!-- Report Cards Page -->
+        <!-- Report cards page -->
         <section class="page" id="reports">
             <div class="section-toolbar">
                 <div>
@@ -445,6 +468,7 @@
             </div>
 
             <div class="filters">
+                <label for="reportSearch" class="sr-only">Search report cards</label>
                 <input type="search" id="reportSearch" placeholder="Search student, class, grade..." oninput="renderReportCards()">
             </div>
 
@@ -453,8 +477,7 @@
             </div>
         </section>
 
-
-        <!-- Attendance Page -->
+        <!-- Attendance page -->
         <section class="page" id="attendance">
             <div class="section-toolbar">
                 <div>
@@ -465,7 +488,7 @@
 
             <div class="stats-grid small-stats">
                 <div class="stat-card">
-                    <i class="fa-solid fa-user-check"></i>
+                    <i class="fa-solid fa-user-check" aria-hidden="true"></i>
                     <div>
                         <span id="presentCount">0</span>
                         <p>Present</p>
@@ -473,7 +496,7 @@
                 </div>
 
                 <div class="stat-card">
-                    <i class="fa-solid fa-user-xmark"></i>
+                    <i class="fa-solid fa-user-xmark" aria-hidden="true"></i>
                     <div>
                         <span id="absentCount">0</span>
                         <p>Absent</p>
@@ -481,7 +504,7 @@
                 </div>
 
                 <div class="stat-card">
-                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star" aria-hidden="true"></i>
                     <div>
                         <span id="averageAttendanceMarks">0</span>
                         <p>Avg Attendance Marks</p>
@@ -559,6 +582,8 @@
                 </table>
             </div>
         </section>
+
+        <!-- Marks edit requests page -->
         <section class="page" id="marksRequests">
             <div class="section-toolbar">
                 <div>
@@ -569,7 +594,7 @@
 
             <div class="stats-grid small-stats">
                 <div class="stat-card">
-                    <i class="fa-solid fa-clock"></i>
+                    <i class="fa-solid fa-clock" aria-hidden="true"></i>
                     <div>
                         <span id="pendingRequests">0</span>
                         <p>Pending</p>
@@ -577,7 +602,7 @@
                 </div>
 
                 <div class="stat-card">
-                    <i class="fa-solid fa-circle-check"></i>
+                    <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
                     <div>
                         <span id="approvedRequests">0</span>
                         <p>Approved</p>
@@ -585,7 +610,7 @@
                 </div>
 
                 <div class="stat-card">
-                    <i class="fa-solid fa-circle-xmark"></i>
+                    <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i>
                     <div>
                         <span id="rejectedRequests">0</span>
                         <p>Rejected</p>
@@ -631,29 +656,113 @@
             </div>
         </section>
 
-        <!-- Footer -->
-        <footer class="footer">
-            <p>© 2026 School Examination Management System | DBMS Semester Project</p>
-        </footer>
-    </main>
-
-    <!-- Modal for all forms -->
-    <div class="modal" id="formModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modalTitle">Add Record</h2>
-                <button class="icon-btn" onclick="closeModal()">
-                    <i class="fa-solid fa-xmark"></i>
+        <!-- Seat allocation page -->
+        <section class="page" id="seatAllocation">
+            <div class="section-toolbar">
+                <div>
+                    <h2>Seat Allocation</h2>
+                    <p>Allocate seats to students for scheduled exams.</p>
+                </div>
+                <button class="btn primary" onclick="openSeatModal()">
+                    <i class="fa-solid fa-plus" aria-hidden="true"></i> Allocate Seat
                 </button>
             </div>
 
-            <!-- Form fields are generated from JavaScript -->
-            <form id="dynamicForm" class="dynamic-form"></form>
+            <div class="stats-grid small-stats">
+                <div class="stat-card">
+                    <i class="fa-solid fa-chair" aria-hidden="true"></i>
+                    <div>
+                        <span id="totalSeats">0</span>
+                        <p>Total Seats</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <i class="fa-solid fa-calendar-days" aria-hidden="true"></i>
+                    <div>
+                        <span id="seatSchedules">0</span>
+                        <p>Schedules Used</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <i class="fa-solid fa-user-graduate" aria-hidden="true"></i>
+                    <div>
+                        <span id="seatedStudents">0</span>
+                        <p>Seated Students</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filters">
+                <label for="seatSearch" class="sr-only">Search seats</label>
+                <input type="search" id="seatSearch" placeholder="Search by student, seat no, exam, subject..." oninput="renderSeatAllocations()">
+
+                <label for="seatScheduleFilter" class="sr-only">Filter seats by schedule</label>
+                <select id="seatScheduleFilter" onchange="renderSeatAllocations()">
+                    <option value="">All Schedules</option>
+                </select>
+            </div>
+
+            <div class="chart-card mt">
+                <div class="section-heading">
+                    <h2>Seat Allocation by Schedule</h2>
+                    <p>How many seats are allocated per exam schedule.</p>
+                </div>
+                <div class="chart-box">
+                    <canvas id="seatAllocationChart"></canvas>
+                </div>
+            </div>
+
+            <div class="section-heading mt">
+                <h2>All Seat Allocations</h2>
+                <p>Showing records from seat_allocation table.</p>
+            </div>
+
+            <div class="table-wrapper mt">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Seat No</th>
+                            <th>Student</th>
+                            <th>Roll No</th>
+                            <th>Exam</th>
+                            <th>Subject</th>
+                            <th>Class</th>
+                            <th>Schedule Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="seatAllocationBody">
+                        <tr><td colspan="9">Loading seat allocations...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2026 School Examination Management System | DBMS Semester Project</p>
+        </footer>
+    </main>
+
+    <!-- Modal -->
+    <div class="modal" id="formModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add Record</h2>
+                <button class="icon-btn" onclick="closeModal()" aria-label="Close modal">
+                    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                </button>
+            </div>
+
+            <form id="dynamicForm" class="dynamic-form" novalidate></form>
         </div>
     </div>
 
-    <!-- Chart JS for dashboard graphs -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chart JS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7"></script>
 
     <!-- Main JS -->
     <script src="app.js"></script>
