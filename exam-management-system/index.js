@@ -78,13 +78,20 @@ app.get('/test-db', async (req, res) => {
 });
 
 // Start Server
-app.listen(PORT, () => {
-    // Check if running in GitHub Codespaces
-    if (process.env.CODESPACE_NAME) {
-        const codespaceUrl = `https://${process.env.CODESPACE_NAME}-${PORT}.app.github.dev`;
-        console.log(`🚀 Server is running on Codespaces: ${codespaceUrl}`);
-    } else {
-        // Fallback for local machine
-        console.log(`🚀 Server is running on http://localhost:${PORT}`);
-    }
-});
+// In local/Codespaces, we need app.listen()
+// In Vercel, app.listen() should not run because Vercel handles the server itself
+if (process.env.VERCEL !== '1') {
+    app.listen(PORT, () => {
+        // Check if running in GitHub Codespaces
+        if (process.env.CODESPACE_NAME) {
+            const codespaceUrl = `https://${process.env.CODESPACE_NAME}-${PORT}.app.github.dev`;
+            console.log(`🚀 Server is running on Codespaces: ${codespaceUrl}`);
+        } else {
+            // Fallback for local machine
+            console.log(`🚀 Server is running on http://localhost:${PORT}`);
+        }
+    });
+}
+
+// Export app for Vercel
+module.exports = app;
