@@ -15,7 +15,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
-// Serve static frontend files from public folder
+// Serve frontend static files from public folder
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ========== ROUTES ==========
@@ -43,7 +43,7 @@ const resultRoutes = require('./routes/resultRoutes');
 const attendanceMarksRoutes = require('./routes/attendanceMarksRoutes');
 const reportCardRoutes = require('./routes/reportCardRoutes');
 
-// Use routes
+// Use API routes
 app.use('/api/persons', personRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/classes', classRoutes);
@@ -67,16 +67,20 @@ app.use('/api/attendance-marks', attendanceMarksRoutes);
 app.use('/api/report-cards', reportCardRoutes);
 
 // Home Route
-// Instead of showing JSON message,
-// now it will open the frontend dashboard
+// Open frontend dashboard when website opens
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+
+    res.sendFile(
+        path.join(__dirname, 'public', 'index.html')
+    );
 });
 
 // Database Test Route
+// Test NeonDB connection
 app.get('/test-db', async (req, res) => {
+
     try {
-        // Check database connection
+
         const result = await pool.query('SELECT NOW()');
 
         res.json({
@@ -93,15 +97,18 @@ app.get('/test-db', async (req, res) => {
     }
 });
 
-// Handle unknown routes
-// If user manually refreshes frontend pages,
-// this helps avoid 404 issues
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+// Frontend fallback route
+// If user refreshes frontend page manually,
+// this prevents Vercel 404 errors
+app.use((req, res) => {
+
+    res.sendFile(
+        path.join(__dirname, 'public', 'index.html')
+    );
 });
 
-// Start server only for local machine / Codespaces
-// Vercel automatically handles serverless deployment
+// Start server only for local machine or Codespaces
+// Vercel automatically handles deployment
 if (process.env.VERCEL !== '1') {
 
     app.listen(PORT, () => {
@@ -112,12 +119,16 @@ if (process.env.VERCEL !== '1') {
             const codespaceUrl =
                 `https://${process.env.CODESPACE_NAME}-${PORT}.app.github.dev`;
 
-            console.log(`🚀 Server is running on Codespaces: ${codespaceUrl}`);
+            console.log(
+                `🚀 Server is running on Codespaces: ${codespaceUrl}`
+            );
 
         } else {
 
             // Running on local machine
-            console.log(`🚀 Server is running on http://localhost:${PORT}`);
+            console.log(
+                `🚀 Server is running on http://localhost:${PORT}`
+            );
         }
     });
 }
