@@ -12,6 +12,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
+
 // Serve static files from the "public" folder
 app.use(express.static('public'));
 
@@ -62,10 +63,10 @@ app.use('/api/results', resultRoutes);
 app.use('/api/attendance-marks', attendanceMarksRoutes);
 app.use('/api/report-cards', reportCardRoutes);
 
-// Test Route
-app.get('/', (req, res) => {
-    res.json({ message: '🎉 School Examination Management System API is running!' });
-});
+// Test Route - COMMENTED OUT so it doesn't block the frontend HTML
+// app.get('/', (req, res) => {
+//     res.json({ message: '🎉 School Examination Management System API is running!' });
+// });
 
 // Database Test Route
 app.get('/test-db', async (req, res) => {
