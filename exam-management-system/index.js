@@ -2,7 +2,9 @@
 
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const pool = require('./config/db');
+
 require('dotenv').config();
 
 const app = express();
@@ -13,10 +15,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
-// Serve static files from the "public" folder
-app.use(express.static('public'));
+// Serve static frontend files from public folder
+app.use(express.static(path.join(__dirname, 'public')));
 
 // ========== ROUTES ==========
+
 // Import routes
 const personRoutes = require('./routes/personRoutes');
 const studentRoutes = require('./routes/studentRoutes');
@@ -63,36 +66,61 @@ app.use('/api/results', resultRoutes);
 app.use('/api/attendance-marks', attendanceMarksRoutes);
 app.use('/api/report-cards', reportCardRoutes);
 
-// Test Route - COMMENTED OUT so it doesn't block the frontend HTML
-// app.get('/', (req, res) => {
-//     res.json({ message: '🎉 School Examination Management System API is running!' });
-// });
+// Home Route
+// Instead of showing JSON message,
+// now it will open the frontend dashboard
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 // Database Test Route
 app.get('/test-db', async (req, res) => {
     try {
+        // Check database connection
         const result = await pool.query('SELECT NOW()');
-        res.json({ message: '✅ Database connection is working!', currentTime: result.rows[0].now });
+
+        res.json({
+            message: '✅ Database connection is working!',
+            currentTime: result.rows[0].now
+        });
+
     } catch (error) {
-        res.status(500).json({ message: '❌ Database connection failed!', error: error.message });
+
+        res.status(500).json({
+            message: '❌ Database connection failed!',
+            error: error.message
+        });
     }
 });
 
-// Start Server
-// In local/Codespaces, we need app.listen()
-// In Vercel, app.listen() should not run because Vercel handles the server itself
+// Handle unknown routes
+// If user manually refreshes frontend pages,
+// this helps avoid 404 issues
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Start server only for local machine / Codespaces
+// Vercel automatically handles serverless deployment
 if (process.env.VERCEL !== '1') {
+
     app.listen(PORT, () => {
-        // Check if running in GitHub Codespaces
+
+        // If running inside GitHub Codespaces
         if (process.env.CODESPACE_NAME) {
-            const codespaceUrl = `https://${process.env.CODESPACE_NAME}-${PORT}.app.github.dev`;
+
+            const codespaceUrl =
+                `https://${process.env.CODESPACE_NAME}-${PORT}.app.github.dev`;
+
             console.log(`🚀 Server is running on Codespaces: ${codespaceUrl}`);
+
         } else {
-            // Fallback for local machine
+
+            // Running on local machine
             console.log(`🚀 Server is running on http://localhost:${PORT}`);
         }
     });
 }
 
-// Export app for Vercel
+// Export app for Vercel deployment
 module.exports = app;
