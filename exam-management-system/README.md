@@ -787,12 +787,13 @@ SZABIST Karachi
   
 ---
 
+# 📜 License
+
+This project is developed for educational and academic purposes.
+
+---
+
 ## 🔍 SEO Keywords
 
 School Examination Management System, Examination Management Software, Student Information System, School ERP, Node.js Project, Express.js Project, PostgreSQL Project, NeonDB Database, Database Management System, DBMS Project, Full Stack Web Application, Educational Management System, School Management System, REST API Project, CRUD Application, University Database Project, Responsive Dashboard, Chart.js Analytics, Academic Management System, Result Processing System, Attendance Management System, Report Card Management, SZABIST Database Project
 
----
-
-# 📜 License
-
-This project is developed for educational and academic purposes.
