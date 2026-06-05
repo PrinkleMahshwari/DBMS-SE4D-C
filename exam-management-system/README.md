@@ -4,7 +4,23 @@
 
 A full-stack Database Systems university project developed using **Node.js, Express.js, PostgreSQL (NeonDB), HTML, CSS, and Vanilla JavaScript**.
 
-This project demonstrates complete CRUD operations, relational database concepts, REST API architecture, responsive frontend development, charts/graphs, and frontend-backend integration for managing school examination workflows.
+![Node.js](https://img.shields.io/badge/Node.js-Backend-green)
+![Express.js](https://img.shields.io/badge/Express.js-REST_API-black)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-blue)
+![NeonDB](https://img.shields.io/badge/NeonDB-Cloud_Database-brightgreen)
+![JavaScript](https://img.shields.io/badge/JavaScript-Frontend-yellow)
+![HTML5](https://img.shields.io/badge/HTML5-Markup-orange)
+![CSS3](https://img.shields.io/badge/CSS3-Styling-blue)
+![Chart.js](https://img.shields.io/badge/Chart.js-Data_Visualization-red)
+![Vercel](https://img.shields.io/badge/Vercel-Deployed-black)
+![GitHub](https://img.shields.io/badge/GitHub-Repository-lightgrey)
+![License](https://img.shields.io/badge/License-Educational-success)
+![Status](https://img.shields.io/badge/Project-Completed-success)
+![SZABIST](https://img.shields.io/badge/SZABIST-BSSE-purple)
+![Live Demo](https://img.shields.io/badge/Live-Demo-success)
+
+
+A full-stack School Examination Management System (SEMS) developed using Node.js, Express.js, PostgreSQL (NeonDB), HTML, CSS, and Vanilla JavaScript. This database management system automates examination workflows including student management, teacher management, exam scheduling, seat allocation, attendance tracking, marks management, result processing, and report card generation through a responsive web-based interface.
 
 ---
 
@@ -43,6 +59,16 @@ The project demonstrates practical implementation of:
 - API integration
 - Responsive UI/UX
 - Real-world relational database workflows
+
+---
+
+## 🌐 Live Demo
+
+🚀 **Live Application:** [School Examination Management System](https://school-exam-management-system.vercel.app/)
+
+📂 **GitHub Repository:** [DBMS-SE4D-C](https://github.com/PrinkleMahshwari/DBMS-SE4D-C)
+
+This project is fully deployed and accessible online through Vercel with PostgreSQL hosted on NeonDB.
 
 ---
 
@@ -753,8 +779,17 @@ This project helped in understanding:
 BS Software Engineering Student  
 SZABIST Karachi
 
-GitHub:  
-https://github.com/PrinkleMahshwari
+## 🔗 Important Links
+
+- 🌐 Live Demo: [School Examination Management System](https://school-exam-management-system.vercel.app/)
+- 📂 GitHub Repository: [DBMS-SE4D-C](https://github.com/PrinkleMahshwari/DBMS-SE4D-C)
+- 👨‍💻 GitHub Profile: [PrinkleMahshwari](https://github.com/PrinkleMahshwari)
+  
+---
+
+## 🔍 SEO Keywords
+
+School Examination Management System, Examination Management Software, Student Information System, School ERP, Node.js Project, Express.js Project, PostgreSQL Project, NeonDB Database, Database Management System, DBMS Project, Full Stack Web Application, Educational Management System, School Management System, REST API Project, CRUD Application, University Database Project, Responsive Dashboard, Chart.js Analytics, Academic Management System, Result Processing System, Attendance Management System, Report Card Management, SZABIST Database Project
 
 ---
 
